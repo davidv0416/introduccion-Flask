@@ -1,10 +1,29 @@
 from flask import Flask, render_template
+import mysql.connector
+
+db = mysql.connector.connect(
+    host='localhost',
+    user='root',
+    password= '',
+    port=3306,
+    database='productos'    
+)
+db.autocommit = True
 
 app = Flask(__name__)
 
 @app.get("/")
+
 def inicio():
-    return render_template("index.html")
+    cursor = db.cursor(dictionary=True)
+    
+    cursor.execute("select * from productos")
+    productos = cursor.fetchall()  #obtener todo
+    #producto = cursor.fetchone() obtener 1 solo registro
+    #print(productos[5]['nombre']) imprime poker de la base de datos
+    
+    cursor.close()
+    return render_template("index.html", productos=productos)
 
 @app.get("/contactos")
 def listarContactos():
