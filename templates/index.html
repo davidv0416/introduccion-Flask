@@ -1,28 +1,33 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio</title>
-</head>
-<body>
-    <h1>Productos</h1>
-    
-    <table>
-        <tr>
-            <td>ID</td>
-            <td>NOMBRE</td>
-            <td>PRECIO</td>
-        </tr>
+{% extends 'base.html' %}
 
-        {% for producto in productos %}
-        <tr>
-            <td> {{ producto['id'] }} </td>
-            <td> {{ producto['nombre'] }} </td>
-            <td> {{ producto['price'] }} </td>
-        </tr>
-        {% endfor %}
+{% block titulo %}
+    Inicio
+{% endblock %}
 
-    </table>
-</body>
-</html>
+{% block contenido %}
+<h1>Productos</h1>
+<a href="{{ url_for('formCrearProducto') }}">Nuevo</a>
+<table>
+    <tr>
+        <td>ID</td>
+        <td>NOMBRE</td>
+        <td>PRECIO</td>
+    </tr>
+
+    {% for producto in productos %}
+    <tr>
+        <td> {{ producto['id'] }} </td>
+        <td> {{ producto['nombre'] }} </td>
+        <td> {{ producto['price'] }} </td>
+        <td>
+            <a href="/editProducto/{{ producto['id'] }}" class="btn btn-secondary">Editar</a>
+            <a href="/eliminar_producto/{{ producto['id'] }}" class="btn btn-danger">Eliminar</a>
+        </td>
+    </tr>
+
+
+    {% endfor %}
+
+</table>
+{% endblock %}
+
