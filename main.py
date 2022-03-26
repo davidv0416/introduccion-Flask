@@ -1,14 +1,6 @@
 from flask import Flask, flash, render_template, request, redirect, url_for
-import mysql.connector
+from models import productosModel
 
-db = mysql.connector.connect(
-    host='localhost',
-    user='root',
-    password= '',
-    port=3306,
-    database='productos'    
-)
-db.autocommit = True
 
 app = Flask(__name__)
 app.secret_key = '*@SERVER0KEY_'
@@ -16,14 +8,8 @@ app.secret_key = '*@SERVER0KEY_'
 @app.get("/")
 
 def inicio():
-    cursor = db.cursor(dictionary=True)
+    productos = productosModel.obtenerProductos()
     
-    cursor.execute("select * from productos")
-    productos = cursor.fetchall()  #obtener todo
-    #producto = cursor.fetchone() obtener 1 solo registro
-    #print(productos[5]['nombre']) imprime poker de la base de datos
-    
-    cursor.close()
     return render_template("index.html", productos=productos)
 
 @app.get("/form_crear")
@@ -55,17 +41,12 @@ def crearProducto():
                 nombre=nombre,
                 price=price,
         )
-    #insertar datos a la base de datos
-    cursor = db.cursor()
-    
-    cursor.execute("insert into productos(nombre, price) values(%s,%s)", (
-        nombre,
-        price,
-    ))
-    cursor.close()
+    productosModel.crearProducto(nombre=nombre, price=price)
     
     return redirect(url_for('inicio'))
 
+
+"""
 @app.route("/edit_producto/<id>")
 def get_Producto(id):
   cursor=db.cursor()
@@ -92,7 +73,7 @@ def eliminarProducto(id):
   db.commit()
   return redirect(url_for("inicio"))
 
-"""@app.get("/contactos")
+@app.get("/contactos")
 def listarContactos():
     return render_template("contactos.html")
 
