@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block titulo %}
+    Inicio
+{% endblock %}
+
+{% block contenido %}
+
+<br>
+
+<div class="container border border-card">
+    <h1 class="text-center">Iniciar sesión</h1>
+    <form class="text-center row g-3" action="/initSesion" method="POST">
+        <div class="container border boder-card" align="center">
+        <div class="mb-3 ">
+            <label class="form-label" for="">Correo Electrónico</label>
+            <input class="form-control" type="text" name="correo">
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="">Contraseña</label>
+            <input class="form-control" type="password" name="clave">
+        </div>
+        <button class="btn btn-primary" type="button">Iniciar sesion</button>
+        </div>
+        
+        <br>
+    </form>
+    <br>
+</div>
+{% endblock %}
