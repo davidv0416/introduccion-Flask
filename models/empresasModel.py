@@ -11,25 +11,16 @@ def obtenerProductos():
     cursor.close()
     return empresas
 
-def obtenerCorreo():
+def obtenerUsuario(correo, clave):
     cursor = db.cursor(dictionary=True)
-    cursor.execute("select * from empresas")
+    cursor.execute(f"SELECT * from empresas WHERE correo={correo} and clave={clave}")
     #empresas = cursor.fetchall()  #obtener todo
-    correo = cursor.fetchone() #obtener 1 solo registro
+    obtenerUsuario = cursor.fetchone() #obtener 1 solo registro
     #print(productos[5]['nombre']) imprime poker de la base de datos
     
     cursor.close()
-    return correo
+    return obtenerUsuario
 
-def obtenerClave():
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("select * from empresas")
-    #empresas = cursor.fetchall()  #obtener todo
-    clave = cursor.fetchone() #obtener 1 solo registro
-    #print(productos[5]['nombre']) imprime poker de la base de datos
-    
-    cursor.close()
-    return clave
 
 def registrar(nombre, contacto, direccion, correo, clave):
      #insertar datos a la base de datos

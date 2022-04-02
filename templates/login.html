@@ -5,6 +5,15 @@
 
 {% block contenido %}
 
+{% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    {% endwith %}
 <br>
 
 <div class="container border border-card">
@@ -17,9 +26,9 @@
         </div>
         <div class="mb-3">
             <label class="form-label" for="">Contraseña</label>
-            <input class="form-control" type="password" name="clave">
+            <input class="form-control" type="password" name="contra" id='contra'>
         </div>
-        <button class="btn btn-primary" type="button">Iniciar sesion</button>
+        <button class="btn btn-primary" type="submit">Iniciar sesion</button>
         </div>
         
         <br>

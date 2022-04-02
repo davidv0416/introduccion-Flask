@@ -1,5 +1,7 @@
 from flask import Flask, flash, render_template, request, redirect, url_for
-from models import empresasModel
+from models import empresasModel, sendEmail
+from validators import required 
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 import hashlib
 from smtplib import SMTP
 from email.message import EmailMessage
@@ -8,6 +10,7 @@ import re
 
 app = Flask(__name__)
 app.secret_key = '*@SERVER0KEY_'
+crearUrl = URLSafeTimedSerializer('Thisisasecret!')
 
 @app.get("/")
 def index():
@@ -18,21 +21,25 @@ def index():
 def login():
     return render_template("login.html")
 
-@app.route("/initSesion")
+@app.get("/initSesion")
 def initSesion():
-    if request.method == 'GET':
-        return render_template("login.html")
+    print('get')
+    
     correo = request.form.get('correo')
-    clave = request.form.get('clave')
+    clave = request.form.get('contra')
+    print(correo)
     clave = hashlib.sha1(clave.encode()).hexdigest()
+        
     
-    email = empresasModel.obtenerCorreo(correo)
-    passw = empresasModel.obtenerClave(clave)
-    
-    if correo == email and clave == passw:
-        return render_template("home.html")
+    resultado = empresasModel.obtenerUsuario(correo, clave)
+        
+    if resultado:
+            print('se encontro ')
     else:
-        flash("Correo o clave incorrecta")
+            return render_template("index.html")
+            
+   
+
 
 @app.route("/eliminar/<string:id>")
 def eliminarEmpresa(id):
@@ -59,12 +66,10 @@ def registrar():
         
         
         is_valid = True
-        if nombre == "":
-            flash("El nombre es requerido")
+        if not required.Required(nombre, 'nombre'):
             is_valid = False 
             
-        if contacto == "":
-            flash("El contacto es requerido")
+        if not required.Required(contacto, 'contacto'):
             is_valid = False
             
         if not contacto.isdigit():
@@ -113,29 +118,22 @@ def registrar():
             )
         
         clave = hashlib.sha1(clave.encode()).hexdigest()
-            
-        msg = EmailMessage()
-        msg.set_content('Su empresa ha sido registrada satisfactoriamente.')
-
-        msg['Subject'] = 'Confirmación de registro'
-        msg['From'] = "davidvivas2020@itp.edu.co"
-        msg['To'] = correo
-
-        username = 'davidvivas2020@itp.edu.co'
-        password = '1085340013'
-
-        server = SMTP('smtp.gmail.com:587')
-        server.starttls()
-        server.login(username, password)
-        server.send_message(msg)
-
-        server.quit()
-        
-        
+        token = crearUrl.dumps(correo, salt='confirmacion-email')
+        link = url_for('confirmarEmail', token=token, _external = True)
+        sendEmail.enviarEmail(correo, link)
         empresasModel.registrar(nombre=nombre, contacto=contacto, direccion=direccion, correo=correo, clave=clave)
         
         
         return redirect(url_for('index'))
+
+@app.route("/confirmarEmail/<token>")
+def confirmarEmail(token):
+    try:
+        tokenTime = crearUrl.loads(token, salt='confirmacion-email', max_age=30)
+    except SignatureExpired:
+        return render_template('expirado.html')
+        
+    return render_template('confirmado.html')
 
 
 """
